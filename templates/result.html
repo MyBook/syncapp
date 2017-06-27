@@ -1,3 +1,85 @@
+<html>
+<head>
+<meta charset="utf-8">
+</head>
+<body>
+<script src="audio.min.js"></script>
+<script>
+  audiojs.events.ready(function() {
+    var as = audiojs.createAll();
+  });
+</script>
+
+
+<form action=""
+enctype="multipart/form-data" method="post">
+<p>
+Аудио:<br>
+<input type="file" name="datafile" size="40">
+</p>
+<p>
+Текст:<br>
+<input type="file" name="datafile" size="40">
+</p>
+<div>
+<input type="submit" value="Загрузить">
+</div>
+</form>
+
+<p> Загружено: </p>
+<p>content15.html</p>
+<p>t_2_i_201610.mp3</p>
+
+<div>
+<audio id="track" src="https://www.dropbox.com/s/1nor6y3ymu1l4o6/t_2_i_201590.mp3?dl=1" preload="auto" 
+ontimeupdate="document.getElementById('tracktime').innerHTML = Math.floor(this.currentTime) + ' / ' + Math.floor(this.duration);"/>
+</div>
+
+<p>Current time:</p>
+<span id="tracktime">0 / 0</span>
+
+
+<p>Current text:</p>
+<div>сюда вывести xpath найденного фрагмента</div>
+
+<br/>
+
+<p>Text highlight:</p>
+<div>
+    <input onclick="domRangehighlight('Цель мероприятия');" type="button" value="Найти текст">
+  </div>
+  <script>
+    function domRangehighlight(text) {
+
+
+   	  var iframe = document.getElementsByTagName('iframe')[0];
+   	  var iframeDoc = iframe.contentWindow.document;
+
+      //var root = document.getElementById('textbook').firstChild;
+      var root = iframeDoc.getElementById('test').firstChild;
+      var content = root.nodeValue;
+      if (~content.indexOf(text)) {
+        if (document.createRange) {
+          var rng = document.createRange();
+          rng.setStart(root, content.indexOf(text));
+          rng.setEnd(root, content.indexOf(text) + text.length);
+          var highlightDiv = document.createElement('span');
+          highlightDiv.style.backgroundColor = 'yellow';
+          rng.surroundContents(highlightDiv);
+        } else
+          alert('Вероятно, у вас IE8-, смотрите реализацию TextRange ниже');
+      } else
+        alert('Совпадений не найдено');
+    }
+  </script>
+
+ <iframe id="textbook" src="content15.html" width="800" height="600" align="left">
+
+</body>
+</html>
+
+
+
 {{ audio }}
 {{ audio_json }}
 {{ map_table }}
