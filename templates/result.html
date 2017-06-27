@@ -31,31 +31,29 @@ ontimeupdate="document.getElementById('tracktime').innerHTML = Math.floor(this.c
 
 <p>Text highlight:</p>
 <div>
-    <input onclick="domRangehighlight('Цель мероприятия');" type="button" value="Найти текст">
+    <input onclick="domRangehighlight('/html/body/div/p[4]');" type="button" value="Найти текст">
   </div>
+
   <script>
-    function domRangehighlight(text) {
+    function domRangehighlight(xpath) {
 
 
    	  var iframe = document.getElementsByTagName('iframe')[0];
    	  var iframeDoc = iframe.contentWindow.document;
 
-      //var root = document.getElementById('textbook').firstChild;
-      var root = iframeDoc.getElementById('test').firstChild;
-      var content = root.nodeValue;
-      if (~content.indexOf(text)) {
-        if (document.createRange) {
-          var rng = document.createRange();
-          rng.setStart(root, content.indexOf(text));
-          rng.setEnd(root, content.indexOf(text) + text.length);
-          var highlightDiv = document.createElement('span');
+      
+      var root = getElementByXpath(xpath, iframeDoc);
+          var rng = iframeDoc.createRange();
+          rng.setStart(root, 0);
+          rng.setEnd(root, 1);
+          var highlightDiv = iframeDoc.createElement('span');
           highlightDiv.style.backgroundColor = 'yellow';
           rng.surroundContents(highlightDiv);
-        } else
-          alert('Вероятно, у вас IE8-, смотрите реализацию TextRange ниже');
-      } else
-        alert('Совпадений не найдено');
     }
+
+    function getElementByXpath(path, doc) {
+  		return doc.evaluate(path, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+	}
   </script>
 
  <iframe id="textbook" src="{{ MEDIA_URL }}{{ text }}" width="800" height="600" align="left">
