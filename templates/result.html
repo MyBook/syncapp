@@ -5,65 +5,100 @@
 <body>
 <script src="{{MEDIA_URL}}/audio.min.js"></script>
 <script>
-  audiojs.events.ready(function() {
-    var as = audiojs.createAll();
-  });
-</script>
+    audiojs.events.ready(function() {
+        var as = audiojs.createAll();
+    });
+    {% autoescape off %}
+    timeJson = {{ audio_json }};
+    idToXpath = {{ id_to_xpath }};
+    XpathToId = {{ xpath_to_id }};
+    {% endautoescape %}
 
+    function getXPathByTime() {
+        for (i=0; i< timeJson.fragments.length; i++){
+            var begin = parseFloat(timeJson.fragments[i].begin);
+            var end = parseFloat(timeJson.fragments[i].end);
+            if (begin < window.tracktime && end > window.tracktime) {
+                var xpath = idToXpath[timeJson.fragments[i].id];
+                document.getElementById('xpath-display').innerHTML = xpath;
+                domRangehighlight(xpath);
+                return
+            }
+        }   
+    }
 
-<p> Загружено: </p>
-<p>content15.html</p>
-<p>t_2_i_201610.mp3</p>
-
-<div>
-<audio id="track" src="{{ MEDIA_URL }}{{ audio }}" preload="auto" 
-ontimeupdate="document.getElementById('tracktime').innerHTML = Math.floor(this.currentTime) + ' / ' + Math.floor(this.duration);"/>
-</div>
-
-<p>Current time:</p>
-<span id="tracktime">0 / 0</span>
-
-
-<p>Current text:</p>
-<div>сюда вывести xpath найденного фрагмента</div>
-
-<br/>
-
-<p>Text highlight:</p>
-<div>
-    <input onclick="domRangehighlight('/html/body/div/p[4]');" type="button" value="Найти текст">
-  </div>
-
-  <script>
     function domRangehighlight(xpath) {
+        var iframe = document.getElementsByTagName('iframe')[0];
+        var iframeDoc = iframe.contentWindow.document;
+        // var prevSpans = iframeDoc.getElementsByClassName('highlight');
+        // if (prevSpans) {
+        //     for (var i=0; i < prevSpans.length; i++) 
+        //         prevSpans[i].style.backgroundColor = 'white';
+        // };
 
-
-   	  var iframe = document.getElementsByTagName('iframe')[0];
-   	  var iframeDoc = iframe.contentWindow.document;
-
-      
-      var root = getElementByXpath(xpath, iframeDoc);
-          var rng = iframeDoc.createRange();
-          rng.setStart(root, 0);
-          rng.setEnd(root, 1);
-          var highlightDiv = iframeDoc.createElement('span');
-          highlightDiv.style.backgroundColor = 'yellow';
-          rng.surroundContents(highlightDiv);
+        var root = getElementByXpath(xpath, iframeDoc);
+        var rng = iframeDoc.createRange();
+        rng.setStart(root, 0);
+        rng.setEnd(root, 1);
+        var highlightDiv = iframeDoc.createElement('span');
+        highlightDiv.setAttribute('class', 'highlight');
+        highlightDiv.style.backgroundColor = 'yellow';
+        rng.surroundContents(highlightDiv);
     }
 
     function getElementByXpath(path, doc) {
   		return doc.evaluate(path, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 	}
-  </script>
 
- <iframe id="textbook" src="{{ MEDIA_URL }}{{ text }}" width="800" height="600" align="left">
+    function init_highlight() { 
+  
+        var iframe = document.getElementsByTagName('iframe')[0];
+        var iframeDoc = iframe.contentWindow.document;
+        
+        iframeDoc.onclick = function(event) {
+            var xpath = getXpathByClick(event.target)
+            domRangehighlight(xpath);
+            var time = getTimeByXpath(xpath);
+            document.getElementById('track').currentTime = time;
+        };
+    };
+
+    function getXpathByClick(el) {
+        if (typeof el == "string") return document.evaluate(el, document, null, 0, null)
+        if (!el || el.nodeType != 1) return ''
+        if (el.id) return "//*[@id='" + el.id + "']"
+        var sames = [].filter.call(el.parentNode.children, function (x) { return x.tagName == el.tagName })
+        return getXpathByClick(el.parentNode) + '/' + el.tagName.toLowerCase() + (sames.length > 1 ? '['+([].indexOf.call(sames, el)+1)+']' : '')
+    };
+
+    function getTimeByXpath(xpath) {
+        var elementId = XpathToId[xpath];
+        for (i=0; i< timeJson.fragments.length; i++){
+            if (timeJson.fragments[i].id === elementId) {
+                var startTime = timeJson.fragments[i].begin
+                return startTime;
+            }
+        }   
+    };
+</script>
+
+<br />
+
+<div>
+    <audio id="track" src="http://sevenfrost.com/audio.mp3" preload="true" 
+    ontimeupdate="window.tracktime = Math.floor(this.currentTime);"/>
+</div>
+
+<div>
+    <button onclick="getXPathByTime();">Where Am I</button>
+</div>
+
+<p>Найденный xpath:</p>
+<div id="xpath-display">xpath найденного фрагмента</div>
+
+<br/>
+
+ <iframe id="textbook" onload="init_highlight();" src="{{ MEDIA_URL }}{{ text }}" width="800" height="600" align="left">
 
 </body>
 </html>
-
-
-
-{{ audio }}
-{{ audio_json }}
-{{ map_table }}
-{{ text }}

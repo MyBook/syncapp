@@ -120,3 +120,5 @@ USE_TZ = True
 MEDIA_ROOT = 'data/'
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
+
+ALLOWED_HOSTS = ['10.6.3.76', '127.0.0.1']
