@@ -21,7 +21,7 @@ from django.contrib import admin
 from syncapp import views
 
 urlpatterns = [
-    url(r'', views.ResultView.as_view()),
+    url(r'^$', views.ResultView.as_view()),
     url(r'^admin/', admin.site.urls),
 ]
 

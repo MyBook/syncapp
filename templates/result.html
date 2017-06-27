@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 </head>
 <body>
-<script src="audio.min.js"></script>
+<script src="{{MEDIA_URL}}/audio.min.js"></script>
 <script>
   audiojs.events.ready(function() {
     var as = audiojs.createAll();
@@ -11,27 +11,12 @@
 </script>
 
 
-<form action=""
-enctype="multipart/form-data" method="post">
-<p>
-Аудио:<br>
-<input type="file" name="datafile" size="40">
-</p>
-<p>
-Текст:<br>
-<input type="file" name="datafile" size="40">
-</p>
-<div>
-<input type="submit" value="Загрузить">
-</div>
-</form>
-
 <p> Загружено: </p>
 <p>content15.html</p>
 <p>t_2_i_201610.mp3</p>
 
 <div>
-<audio id="track" src="https://www.dropbox.com/s/1nor6y3ymu1l4o6/t_2_i_201590.mp3?dl=1" preload="auto" 
+<audio id="track" src="{{ MEDIA_URL }}{{ audio }}" preload="auto" 
 ontimeupdate="document.getElementById('tracktime').innerHTML = Math.floor(this.currentTime) + ' / ' + Math.floor(this.duration);"/>
 </div>
 
@@ -73,7 +58,7 @@ ontimeupdate="document.getElementById('tracktime').innerHTML = Math.floor(this.c
     }
   </script>
 
- <iframe id="textbook" src="content15.html" width="800" height="600" align="left">
+ <iframe id="textbook" src="{{ MEDIA_URL }}{{ text }}" width="800" height="600" align="left">
 
 </body>
 </html>
